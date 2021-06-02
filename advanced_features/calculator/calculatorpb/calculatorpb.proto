@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package calculator;
+option go_package = "advanced_features/calculator/calculatorpb/";
+
+message Salute {
+  string first_name = 1;
+  string last_name = 2;
+}
+
+message SquareRootRequest {
+  int32 number = 1;
+}
+
+message SquareRootResponse {
+  double number_root = 1;
+}
+
+message SaluteWithDeadlineRequest {
+  Salute salute = 1;
+}
+
+message SaluteWithDeadlineResponse {
+  string response = 1;
+}
+
+service AdvancedService{
+
+  /**
+   * Error handling
+   * this RPC will thrown an error if the number sent is negative
+   * the error being sent is of type INVALID_ARGUMENT
+   */
+  rpc SquareRoot(SquareRootRequest) returns (SquareRootResponse) {};
+
+  /**
+   * Deadlines
+   * this RPC will throw errors if deadline time is exceeded
+   */
+
+  rpc SaluteWithDeadline(SaluteWithDeadlineRequest) returns (SaluteWithDeadlineResponse) {};
+}
+
