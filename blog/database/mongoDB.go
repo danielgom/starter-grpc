@@ -11,6 +11,7 @@ import (
 
 var (
 	Collection *mongo.Collection
+	client *mongo.Client
 )
 
 func Init() {
@@ -31,4 +32,11 @@ func Init() {
 	}
 
 	log.Println("Successfully connected to MongoDB")
+}
+
+func Close() {
+
+	if err := client.Disconnect(context.Background()); err != nil {
+		log.Fatalln("Error closing the connection with MongoDB")
+	}
 }

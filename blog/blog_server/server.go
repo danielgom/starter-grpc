@@ -46,20 +46,20 @@ func main() {
 	// Register reflection service on gRPC server
 	reflection.Register(s)
 
+	// Shutdown gracefully
 	go func() {
-		log.Println("Server successfully started on", time.Now().Sub(st))
-		if err := s.Serve(lis); err != nil {
-			log.Fatalln("error listening to the server, ", err.Error())
-		}
+		sigs := make(chan os.Signal, 1)
+		signal.Notify(sigs, os.Interrupt)
+		<-sigs
+		log.Println("Performing shutdown...")
+		s.Stop()
+		log.Println("Closing MongoDB connection...")
+		database.Close()
+		log.Println("Server closed!")
 	}()
 
-	ch := make(chan os.Signal)
-	signal.Notify(ch, os.Interrupt)
-
-	<-ch
-	log.Println("Stopping the server...")
-	s.Stop()
-	log.Println("Stopping the listener...")
-	log.Println("Closing MongoDB connection...")
-	log.Println("Server closed")
+	log.Println("Server successfully started on", time.Now().Sub(st))
+	if err := s.Serve(lis); err != nil {
+		log.Fatalln("error listening to the server, ", err.Error())
+	}
 }
